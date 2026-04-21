@@ -27,8 +27,11 @@ public class ContractService {
     @Autowired
     private PaymentRepository paymentRepository;
     
+    @Autowired
+    private EmailNotificationService emailNotificationService;
+    
     public StudentContract createContract(String studentId, String studentName, String studentEmail, 
-            BigDecimal totalAmount, LocalDate startDate) {
+            String notificationEmail, BigDecimal totalAmount, LocalDate startDate) {
         
         String contractId = "CON-" + studentId + "-" + System.currentTimeMillis();
         
@@ -37,12 +40,15 @@ public class ContractService {
         contract.setStudentId(studentId);
         contract.setStudentName(studentName);
         contract.setStudentEmail(studentEmail);
+        contract.setNotificationEmail(notificationEmail); // Set custom notification email
         contract.setTotalAmount(totalAmount);
         contract.setPaidAmount(BigDecimal.ZERO);
         contract.setRemainingAmount(totalAmount);
         contract.setStartDate(startDate);
-        contract.setEndDate(startDate.plusYears(1));
-        contract.setStatus("ACTIVE");
+        contract.setEndDate(startDate.plusMonths(3)); // 3-month payment period
+        contract.setStatus("PENDING_INITIAL_PAYMENT");
+        contract.setContractEligible(false); // Becomes true when 50% is paid
+        contract.setPenaltyApplied(BigDecimal.ZERO);
         contract.setCreatedAt(LocalDateTime.now());
         contract.setUpdatedAt(LocalDateTime.now());
         
@@ -54,25 +60,55 @@ public class ContractService {
     }
     
     private void createInstallments(StudentContract contract, BigDecimal totalAmount) {
-        int numberOfInstallments = 4;
-        BigDecimal installmentAmount = totalAmount.divide(BigDecimal.valueOf(numberOfInstallments), 2, BigDecimal.ROUND_HALF_UP);
-        
+        // New 3-month payment plan: 50% (Month 1), 25% (Month 2), 25% (Month 3)
         LocalDate startDate = contract.getStartDate();
         
-        for (int i = 1; i <= numberOfInstallments; i++) {
-            Installment installment = new Installment();
-            installment.setInstallmentId("INST-" + contract.getStudentId() + "-" + i);
-            installment.setContract(contract);
-            installment.setInstallmentNumber(i);
-            installment.setAmount(installmentAmount);
-            installment.setPaidAmount(BigDecimal.ZERO);
-            installment.setDueDate(startDate.plusMonths((i - 1) * 3));
-            installment.setStatus("PENDING");
-            installment.setCreatedAt(LocalDateTime.now());
-            installment.setUpdatedAt(LocalDateTime.now());
-            
-            installmentRepository.save(installment);
-        }
+        // Installment 1: 50% - Initial Payment (Month 1)
+        Installment installment1 = new Installment();
+        installment1.setInstallmentId("INST-" + contract.getStudentId() + "-1");
+        installment1.setContract(contract);
+        installment1.setInstallmentNumber(1);
+        BigDecimal halfAmount = totalAmount.multiply(BigDecimal.valueOf(0.5));
+        installment1.setAmount(halfAmount);
+        installment1.setPaidAmount(BigDecimal.ZERO);
+        installment1.setDueDate(startDate); // Immediate payment required
+        installment1.setStatus("PENDING");
+        installment1.setIsOverdue(false);
+        installment1.setPenaltyAmount(BigDecimal.ZERO);
+        installment1.setCreatedAt(LocalDateTime.now());
+        installment1.setUpdatedAt(LocalDateTime.now());
+        installmentRepository.save(installment1);
+        
+        // Installment 2: 25% - Second Month Payment
+        Installment installment2 = new Installment();
+        installment2.setInstallmentId("INST-" + contract.getStudentId() + "-2");
+        installment2.setContract(contract);
+        installment2.setInstallmentNumber(2);
+        BigDecimal quarterAmount = totalAmount.multiply(BigDecimal.valueOf(0.25));
+        installment2.setAmount(quarterAmount);
+        installment2.setPaidAmount(BigDecimal.ZERO);
+        installment2.setDueDate(startDate.plusMonths(1)); // Month 2
+        installment2.setStatus("PENDING");
+        installment2.setIsOverdue(false);
+        installment2.setPenaltyAmount(BigDecimal.ZERO);
+        installment2.setCreatedAt(LocalDateTime.now());
+        installment2.setUpdatedAt(LocalDateTime.now());
+        installmentRepository.save(installment2);
+        
+        // Installment 3: 25% - Third Month Payment
+        Installment installment3 = new Installment();
+        installment3.setInstallmentId("INST-" + contract.getStudentId() + "-3");
+        installment3.setContract(contract);
+        installment3.setInstallmentNumber(3);
+        installment3.setAmount(quarterAmount);
+        installment3.setPaidAmount(BigDecimal.ZERO);
+        installment3.setDueDate(startDate.plusMonths(2)); // Month 3
+        installment3.setStatus("PENDING");
+        installment3.setIsOverdue(false);
+        installment3.setPenaltyAmount(BigDecimal.ZERO);
+        installment3.setCreatedAt(LocalDateTime.now());
+        installment3.setUpdatedAt(LocalDateTime.now());
+        installmentRepository.save(installment3);
     }
     
     public Optional<StudentContract> getContractByStudentId(String studentId) {
@@ -103,11 +139,38 @@ public class ContractService {
                     installment.setSlipNumber(slipNumber);
                     installment.setTransactionId(transactionId);
                     installment.setPaymentChannel(payment.getChannel());
+                    
+                    // Check if payment is overdue and apply 5% penalty
+                    if (LocalDate.now().isAfter(installment.getDueDate())) {
+                        installment.setIsOverdue(true);
+                        // 5% penalty on remaining 50% (only for installments 2 and 3)
+                        if (installment.getInstallmentNumber() > 1) {
+                            BigDecimal remainingBalance = payment.getContract().getTotalAmount()
+                                .multiply(BigDecimal.valueOf(0.5)); // 50% remaining
+                            BigDecimal penalty = remainingBalance.multiply(BigDecimal.valueOf(0.05));
+                            installment.setPenaltyAmount(penalty);
+                            
+                            // Update contract penalty
+                            payment.getContract().setPenaltyApplied(penalty);
+                        }
+                    }
+                    
                     installment.setUpdatedAt(LocalDateTime.now());
                     installmentRepository.save(installment);
                     
                     // Update contract
                     updateContractPaidAmount(installment.getContract().getStudentId());
+                    
+                    // Send appropriate email notification
+                    StudentContract updatedContract = installment.getContract();
+                    if (Boolean.TRUE.equals(updatedContract.getContractEligible()) && 
+                        updatedContract.getPaidAmount().compareTo(updatedContract.getTotalAmount()) < 0) {
+                        // Just became eligible - send eligibility email
+                        emailNotificationService.sendContractEligibilityEmail(updatedContract);
+                    } else if (updatedContract.getStatus().equals("COMPLETED")) {
+                        // Fully paid - send completion email
+                        emailNotificationService.sendPaymentCompletionEmail(updatedContract);
+                    }
                 }
             }
             
@@ -124,20 +187,29 @@ public class ContractService {
             
             BigDecimal totalPaid = installments.stream()
                 .filter(inst -> "PAID".equals(inst.getStatus()))
-                .map(Installment::getPaidAmount)
+                .map(Installment::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
             
             contract.setPaidAmount(totalPaid);
             contract.setRemainingAmount(contract.getTotalAmount().subtract(totalPaid));
             contract.setUpdatedAt(LocalDateTime.now());
             
-            // Check if contract is VALID (at least 50% paid)
             BigDecimal halfAmount = contract.getTotalAmount().divide(BigDecimal.valueOf(2));
             
+            // Check if 50% is paid - student becomes eligible for contract
             if (contract.getPaidAmount().compareTo(halfAmount) >= 0) {
-                contract.setStatus("VALID");
-            } else if (contract.getRemainingAmount().compareTo(BigDecimal.ZERO) <= 0) {
+                contract.setContractEligible(true);
+                contract.setStatus("ELIGIBLE_FOR_CONTRACT");
+            } else {
+                contract.setContractEligible(false);
+                contract.setStatus("PENDING_INITIAL_PAYMENT");
+            }
+            
+            // If 100% paid, contract is completed
+            if (contract.getRemainingAmount().compareTo(BigDecimal.ZERO) <= 0) {
                 contract.setStatus("COMPLETED");
+            } else if (contract.getContractEligible() && contract.getRemainingAmount().compareTo(BigDecimal.ZERO) > 0) {
+                contract.setStatus("PAYMENT_IN_PROGRESS");
             }
             
             contractRepository.save(contract);

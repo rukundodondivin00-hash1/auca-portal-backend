@@ -43,6 +43,12 @@ public class Installment {
     @Column(name = "payment_channel")
     private String paymentChannel;
     
+    @Column(name = "is_overdue")
+    private Boolean isOverdue; // true if payment passed due date
+    
+    @Column(name = "penalty_amount")
+    private BigDecimal penaltyAmount; // 5% of remaining balance if overdue
+    
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     
@@ -86,6 +92,12 @@ public class Installment {
     
     public String getPaymentChannel() { return paymentChannel; }
     public void setPaymentChannel(String paymentChannel) { this.paymentChannel = paymentChannel; }
+    
+    public Boolean getIsOverdue() { return isOverdue; }
+    public void setIsOverdue(Boolean isOverdue) { this.isOverdue = isOverdue; }
+    
+    public BigDecimal getPenaltyAmount() { return penaltyAmount; }
+    public void setPenaltyAmount(BigDecimal penaltyAmount) { this.penaltyAmount = penaltyAmount; }
     
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

@@ -1,29 +1,37 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/auca_db
-    username: postgres
-    password: postgres
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/auca_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
-
-urubutopay:
-  base-url: https://staging.urubutopay.rw
-  api-key: upg:test_sk_fc9b5563a9eb327e047d65353e9a293a:20e08c2ce27d1ccd3af9c900c71ba6a8
-  merchant-code: TH43069310
-  service-code: tuition-fees-7749
-  callback-url: http://102.22.174.127:8080/api/payment/callback
-  notification-url: http://102.22.174.127:8080/api/payment/notification
-  auth-url: http://102.22.174.127:8080/auth/authenticate
-  payer-verify-url: http://102.22.174.127:8080/payer/verify
+    show-sql: false
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 jwt:
-  secret: urubuto-webhook-secret-key-2024-auca-portal
+  secret: ${JWT_SECRET:urubuto-webhook-secret-key-2024-auca-portal}
 
 webhook:
-  username: urubuto_webhook
-  password: webhook_password_2024
+  username: ${WEBHOOK_USERNAME:urubuto_webhook}
+  password: ${WEBHOOK_PASSWORD:webhook_password_2024}
+
+auca:
+  notification:
+    email: notifications@auca.ac.rw
+  finance:
+    base-url: ${AUCA_FINANCE_BASE_URL:https://auca-ims.onrender.com}
+    api-key: ${AUCA_FINANCE_API_KEY:}

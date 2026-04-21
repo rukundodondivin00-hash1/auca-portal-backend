@@ -22,6 +22,9 @@ public class StudentContract {
     private String studentName;
     private String studentEmail;
     
+    @Column(name = "notification_email")
+    private String notificationEmail; // Email address where contract notifications are sent
+    
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
     
@@ -37,7 +40,13 @@ public class StudentContract {
     @Column(name = "end_date")
     private LocalDate endDate;
     
-    private String status; // ACTIVE, COMPLETED, CANCELLED
+    private String status; // PENDING_INITIAL_PAYMENT, ELIGIBLE_FOR_CONTRACT, PAYMENT_IN_PROGRESS, COMPLETED, CANCELLED
+    
+    @Column(name = "contract_eligible")
+    private Boolean contractEligible; // true when 50% is paid
+    
+    @Column(name = "penalty_applied")
+    private BigDecimal penaltyApplied; // 5% penalty on remaining 50% if late
     
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -62,6 +71,9 @@ public class StudentContract {
     public String getStudentEmail() { return studentEmail; }
     public void setStudentEmail(String studentEmail) { this.studentEmail = studentEmail; }
     
+    public String getNotificationEmail() { return notificationEmail; }
+    public void setNotificationEmail(String notificationEmail) { this.notificationEmail = notificationEmail; }
+    
     public BigDecimal getTotalAmount() { return totalAmount; }
     public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
     
@@ -79,6 +91,12 @@ public class StudentContract {
     
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    
+    public Boolean getContractEligible() { return contractEligible; }
+    public void setContractEligible(Boolean contractEligible) { this.contractEligible = contractEligible; }
+    
+    public BigDecimal getPenaltyApplied() { return penaltyApplied; }
+    public void setPenaltyApplied(BigDecimal penaltyApplied) { this.penaltyApplied = penaltyApplied; }
     
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

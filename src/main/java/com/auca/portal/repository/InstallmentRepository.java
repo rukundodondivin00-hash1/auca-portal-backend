@@ -12,4 +12,5 @@ public interface InstallmentRepository extends JpaRepository<Installment, Long> 
     List<Installment> findByContract_StudentId(String studentId);
     Optional<Installment> findByInstallmentId(String installmentId);
     List<Installment> findByContract_ContractIdOrderByInstallmentNumberAsc(String contractId);
+    List<Installment> findByStatus(String status); // For getting pending installments
 }
