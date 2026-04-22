@@ -1,4 +1,4 @@
-﻿package com.auca.portal.service;
+package com.auca.portal.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -32,7 +32,7 @@ public class AucaFinanceClient {
         return headers;
     }
 
-// AUTH - Login to AUCA
+    // AUTH - Login to AUCA
     public Map<String, Object> login(String username, String password) {
         try {
             String url = aucaBaseUrl + "/api/v1/common/auth/signin";

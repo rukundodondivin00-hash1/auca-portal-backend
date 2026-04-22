@@ -1,4 +1,4 @@
-﻿package com.auca.portal.controller;
+package com.auca.portal.controller;
 
 import com.auca.portal.service.AucaFinanceClient;
 import io.jsonwebtoken.Jwts;
@@ -22,13 +22,13 @@ public class StudentPortalAuthController {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-@PostMapping("/signin")
+    @PostMapping("/signin")
     public ResponseEntity<?> signin(@RequestBody Map<String, String> credentials) {
         String username = credentials.get("username");
         String password = credentials.get("password");
 
         Map<String, Object> aucaResponse = aucaFinanceClient.login(username, password);
- 
+
         if (aucaResponse == null) {
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
