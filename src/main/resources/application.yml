@@ -6,10 +6,12 @@ spring:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/auca_db}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
+
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
+
   mail:
     host: smtp.gmail.com
     port: 587
@@ -23,15 +25,16 @@ spring:
             enable: true
 
 jwt:
-  secret: ${JWT_SECRET:urubuto-webhook-secret-key-2024-auca-portal}
+  secret: ${JWT_SECRET:change-this-in-production}
 
 webhook:
-  username: ${WEBHOOK_USERNAME:urubuto_webhook}
-  password: ${WEBHOOK_PASSWORD:webhook_password_2024}
+  username: ${WEBHOOK_USERNAME:webhook_user}
+  password: ${WEBHOOK_PASSWORD:webhook_password}
 
 auca:
   notification:
     email: notifications@auca.ac.rw
+
   finance:
     base-url: ${AUCA_FINANCE_BASE_URL:https://auca-ims.onrender.com}
     api-key: ${AUCA_FINANCE_API_KEY:}
