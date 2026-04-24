@@ -19,8 +19,8 @@ public class AucaFinanceClient {
 
     private final RestTemplate restTemplate;
 
-    public AucaFinanceClient() {
-        this.restTemplate = new RestTemplate();
+    public AucaFinanceClient(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
     private HttpHeaders getHeaders() {
