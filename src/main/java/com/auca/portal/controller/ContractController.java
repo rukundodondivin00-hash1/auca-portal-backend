@@ -167,7 +167,7 @@ public class ContractController {
             ContractResponse response = mapToContractResponse(contract);
 
             return ResponseEntity.ok(Map.of(
-                    "success": true,
+                    "success", true,
                     "contract": response,
                     "student": studentData,
                     "feeStructure": feeStructure != null ? feeStructure : new HashMap<>(),
@@ -177,8 +177,8 @@ public class ContractController {
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "success": false,
-                    "error": e.getMessage()
+                    "success", false,
+                    "error", e.getMessage()
             ));
         }
     }
@@ -197,16 +197,16 @@ public class ContractController {
                     Map<String, Object> aucaPayments = aucaFinanceClient.getStudentPayments(studentId);
 
                     return ResponseEntity.ok(Map.of(
-                            "success": true,
+                            "success", true,
                             "contract": response,
                             "studentFromAuca": studentData != null ? studentData : new HashMap<>(),
-                            "balanceFromAuca": balance != null ? balance : Map.of("balance", 0),
-                            "paymentsFromAuca": aucaPayments != null ? aucaPayments : new HashMap<>()
+                            "balanceFromAuca", balance != null ? balance : Map.of("balance", 0),
+                            "paymentsFromAuca", aucaPayments != null ? aucaPayments : new HashMap<>()
                     ));
                 })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
-                        "success": false,
-                        "error": "Contract not found"
+                        "success", false,
+                        "error", "Contract not found"
                 )));
     }
 
