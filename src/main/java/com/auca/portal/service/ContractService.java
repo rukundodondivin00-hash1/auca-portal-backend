@@ -27,9 +27,6 @@ public class ContractService {
     @Autowired
     private PaymentRepository paymentRepository;
     
-    @Autowired
-    private EmailNotificationService emailNotificationService;
-    
     public StudentContract createContract(String studentId, String studentName, String studentEmail, 
             String notificationEmail, BigDecimal totalAmount, LocalDate startDate) {
         
@@ -166,10 +163,8 @@ public class ContractService {
                     if (Boolean.TRUE.equals(updatedContract.getContractEligible()) && 
                         updatedContract.getPaidAmount().compareTo(updatedContract.getTotalAmount()) < 0) {
                         // Just became eligible - send eligibility email
-                        emailNotificationService.sendContractEligibilityEmail(updatedContract);
                     } else if (updatedContract.getStatus().equals("COMPLETED")) {
                         // Fully paid - send completion email
-                        emailNotificationService.sendPaymentCompletionEmail(updatedContract);
                     }
                 }
             }

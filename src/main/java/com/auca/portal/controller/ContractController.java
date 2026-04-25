@@ -167,18 +167,18 @@ public class ContractController {
             ContractResponse response = mapToContractResponse(contract);
 
             return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "contract", response,
-                    "student", studentData,
-                    "feeStructure", feeStructure != null ? feeStructure : new HashMap<>(),
-                    "balanceFromAuca", outstandingBalance,
-                    "paidFromAuca", paidAmount
+                    "success": true,
+                    "contract": response,
+                    "student": studentData,
+                    "feeStructure": feeStructure != null ? feeStructure : new HashMap<>(),
+                    "balanceFromAuca": outstandingBalance,
+                    "paidFromAuca": paidAmount
             ));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "success", false,
-                    "error", e.getMessage()
+                    "success": false,
+                    "error": e.getMessage()
             ));
         }
     }
@@ -197,33 +197,17 @@ public class ContractController {
                     Map<String, Object> aucaPayments = aucaFinanceClient.getStudentPayments(studentId);
 
                     return ResponseEntity.ok(Map.of(
-                            "success", true,
-                            "contract", response,
-                            "studentFromAuca", studentData != null ? studentData : new HashMap<>(),
-                            "balanceFromAuca", balance != null ? balance : Map.of("balance", 0),
-                            "paymentsFromAuca", aucaPayments != null ? aucaPayments : new HashMap<>()
+                            "success": true,
+                            "contract": response,
+                            "studentFromAuca": studentData != null ? studentData : new HashMap<>(),
+                            "balanceFromAuca": balance != null ? balance : Map.of("balance", 0),
+                            "paymentsFromAuca": aucaPayments != null ? aucaPayments : new HashMap<>()
                     ));
                 })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
-                        "success", false,
-                        "error", "Contract not found"
+                        "success": false,
+                        "error": "Contract not found"
                 )));
-    }
-
-    // UPDATE PAYMENT STATUS
-    @PostMapping("/payment/update")
-    public ResponseEntity<?> updatePaymentStatus(@RequestBody Map<String, String> request) {
-
-        String transactionId = request.get("transactionId");
-        String status = request.get("status");
-        String slipNumber = request.get("slipNumber");
-
-        contractService.updatePaymentStatus(transactionId, status, slipNumber);
-
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Payment status updated"
-        ));
     }
 
     private ContractResponse mapToContractResponse(StudentContract contract) {
@@ -254,4 +238,3 @@ public class ContractController {
         return response;
     }
 }
-
