@@ -4,6 +4,13 @@ import com.auca.portal.dto.ContractResponse;
 import com.auca.portal.entity.StudentContract;
 import com.auca.portal.service.AucaFinanceClient;
 import com.auca.portal.service.ContractService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +23,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/contract")
+@Tag(name = "Contract Management", description = "APIs for contract creation and management")
 public class ContractController {
 
     @Autowired
@@ -24,9 +32,32 @@ public class ContractController {
     @Autowired
     private AucaFinanceClient aucaFinanceClient;
 
-    // GET STUDENT DATA FROM AUCA
+    @Operation(
+        summary = "Get student data from AUCA system",
+        description = "Retrieves comprehensive student information including department, program details, fee structure, and current balance"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Student data retrieved successfully",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{success: true, student: {studentId: STU001}}")
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Student not found in AUCA system",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{success: false, error: Student not found}")
+            )
+        )
+    })
     @GetMapping("/student/{studentId}")
-    public ResponseEntity<?> getStudentFromAuca(@PathVariable String studentId) {
+    public ResponseEntity<?> getStudentFromAuca(
+            @Parameter(description = "Unique student identifier", required = true, example = "STU001")
+            @PathVariable String studentId) {
 
         Map<String, Object> studentData = aucaFinanceClient.getStudentData(studentId);
 
@@ -50,9 +81,32 @@ public class ContractController {
         ));
     }
 
-    // GET BALANCE FROM AUCA
+    @Operation(
+        summary = "Get student balance from AUCA",
+        description = "Retrieves the current outstanding balance for a student"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Balance retrieved successfully",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{success: true, balance: {balance: 250000}}")
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Balance not found for student",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{success: false, error: Balance not found}")
+            )
+        )
+    })
     @GetMapping("/{studentId}/balance")
-    public ResponseEntity<?> getBalance(@PathVariable String studentId) {
+    public ResponseEntity<?> getBalance(
+            @Parameter(description = "Unique student identifier", required = true, example = "STU001")
+            @PathVariable String studentId) {
 
         Map<String, Object> balance = aucaFinanceClient.getStudentBalance(studentId);
 
@@ -70,9 +124,48 @@ public class ContractController {
         ));
     }
 
-    // CREATE CONTRACT
+    @Operation(
+        summary = "Create a new contract",
+        description = "Creates a contract for a student after validating payment status. Student must have paid at least 50% of total fees."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Contract created successfully",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{success: true, contract: {}}")
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Payment too low or invalid student data",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{success: false, error: Payment too low}")
+            )
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Internal server error",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{success: false, error: Error message}")
+            )
+        )
+    })
     @PostMapping("/create")
-    public ResponseEntity<?> createContract(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> createContract(
+            @Parameter(description = "Contract creation request payload with studentId", required = true)
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                description = "Contract creation request",
+                required = true,
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(example = "{studentId: STU001, notificationEmail: student@email.com, startDate: 2026-04-26}")
+                )
+            )
+            @RequestBody Map<String, Object> request) {
 
         try {
 
@@ -183,9 +276,32 @@ public class ContractController {
         }
     }
 
-    // GET CONTRACT
+    @Operation(
+        summary = "Get contract by student ID",
+        description = "Retrieves a student's contract details including payment progress, status, and related information"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Contract retrieved successfully",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{success: true, contract: {}}")
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Contract not found for student",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{success: false, error: Contract not found}")
+            )
+        )
+    })
     @GetMapping("/{studentId}")
-    public ResponseEntity<?> getContract(@PathVariable String studentId) {
+    public ResponseEntity<?> getContract(
+            @Parameter(description = "Unique student identifier", required = true, example = "STU001")
+            @PathVariable String studentId) {
 
         return contractService.getContractByStudentId(studentId)
                 .map(contract -> {
