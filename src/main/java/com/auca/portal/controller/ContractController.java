@@ -35,44 +35,44 @@ public class ContractController {
     @Autowired
     private AucaFinanceClient aucaFinanceClient;
 
-            @Operation(
-                summary = "Retrieve Student Data from AUCA System",
-                description = "Fetches comprehensive student information from the AUCA Finance system including department details, program information, fee structure, and current outstanding balance. This endpoint integrates with the external AUCA IMS API to retrieve real-time student data."
+    @Operation(
+        summary = "Retrieve Student Data from AUCA System",
+        description = "Fetches comprehensive student information from the AUCA Finance system including department details, program information, fee structure, and current outstanding balance. This endpoint integrates with the external AUCA IMS API to retrieve real-time student data."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Student data successfully retrieved from AUCA system",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{\n  \"success\": true,\n  \"student\": {\n    \"studentId\": \"STU001\",\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@auca.ac.rw\",\n    \"departmentCode\": \"CS\",\n    \"program\": \"Computer Science\"\n  },\n  \"feeStructure\": {\n    \"creditPrice\": 500000,\n    \"registrationFee\": 50000,\n    \"graduationFee\": 100000\n  },\n  \"balance\": {\n    \"balance\": 250000\n  }\n}")
             )
-            @ApiResponses(value = {
-                @ApiResponse(
-                    responseCode = "200",
-                    description = "Student data successfully retrieved from AUCA system",
-                    content = @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(example = "{\n  \"success\": true,\n  \"student\": {\n    \"studentId\": \"STU001\",\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@auca.ac.rw\",\n    \"departmentCode\": \"CS\",\n    \"program\": \"Computer Science\"\n  },\n  \"feeStructure\": {\n    \"creditPrice\": 500000,\n    \"registrationFee\": 50000,\n    \"graduationFee\": 100000\n  },\n  \"balance\": {\n    \"balance\": 250000\n  }\n}")
-                    )
-                ),
-                @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid request - student ID format is incorrect",
-                    content = @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Invalid student ID format\"\n}")
-                    )
-                ),
-                @ApiResponse(
-                    responseCode = "404",
-                    description = "Student not found in AUCA system",
-                    content = @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Student not found in AUCA\"\n}")
-                    )
-                ),
-                @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal server error or AUCA service unavailable",
-                    content = @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Failed to connect to AUCA Finance service\"\n}")
-                    )
-                )
-            })
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid request - student ID format is incorrect",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Invalid student ID format\"\n}")
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Student not found in AUCA system",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Student not found in AUCA\"\n}")
+            )
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Internal server error or AUCA service unavailable",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Failed to connect to AUCA Finance service\"\n}")
+            )
+        )
+    })
     @GetMapping("/student/{studentId}")
     public ResponseEntity<?> getStudentFromAuca(
             @Parameter(
