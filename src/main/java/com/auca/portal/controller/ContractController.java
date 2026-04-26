@@ -168,11 +168,11 @@ public class ContractController {
 
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "contract": response,
-                    "student": studentData,
-                    "feeStructure": feeStructure != null ? feeStructure : new HashMap<>(),
-                    "balanceFromAuca": outstandingBalance,
-                    "paidFromAuca": paidAmount
+                    "contract", response,
+                    "student", studentData,
+                    "feeStructure", feeStructure != null ? feeStructure : new HashMap<>(),
+                    "balanceFromAuca", outstandingBalance,
+                    "paidFromAuca", paidAmount
             ));
 
         } catch (Exception e) {
@@ -198,8 +198,8 @@ public class ContractController {
 
                     return ResponseEntity.ok(Map.of(
                             "success", true,
-                            "contract": response,
-                            "studentFromAuca": studentData != null ? studentData : new HashMap<>(),
+                            "contract", response,
+                            "studentFromAuca", studentData != null ? studentData : new HashMap<>(),
                             "balanceFromAuca", balance != null ? balance : Map.of("balance", 0),
                             "paymentsFromAuca", aucaPayments != null ? aucaPayments : new HashMap<>()
                     ));
