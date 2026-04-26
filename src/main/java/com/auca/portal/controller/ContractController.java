@@ -25,20 +25,7 @@ import java.util.*;
 @RequestMapping("/api/contract")
 @Tag(
     name = "Contract Management",
-    description = """
-        APIs for student contract creation and management with AUCA Finance integration.
-        This controller handles contract lifecycle operations including eligibility verification,
-        contract generation, and retrieval of contract details with real-time synchronization
-        from the AUCA Finance system.
-        \n\n
-        **Key Operations:**\n
-        - Fetch student data and balance from AUCA\n
-        - Create contracts after payment validation (minimum 50% required)\n
-        - Retrieve contract details with payment progress tracking\n
-        \n\n
-        All responses follow a standard format with a `success` flag, data payload, and
-        appropriate HTTP status codes. Error responses include descriptive error messages.
-        """
+    description = "APIs for student contract creation and management with AUCA Finance integration. This controller handles contract lifecycle operations including eligibility verification, contract generation, and retrieval of contract details with real-time synchronization from the AUCA Finance system."
 )
 public class ContractController {
 
@@ -48,78 +35,44 @@ public class ContractController {
     @Autowired
     private AucaFinanceClient aucaFinanceClient;
 
-    @Operation(
-        summary = "Retrieve Student Data from AUCA System",
-        description = "Fetches comprehensive student information from the AUCA Finance system including department details, program information, fee structure, and current outstanding balance. This endpoint integrates with the external AUCA IMS API to retrieve real-time student data."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Student data successfully retrieved from AUCA system",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": true,
-                      "student": {
-                        "studentId": "STU001",
-                        "name": "John Doe",
-                        "email": "john.doe@auca.ac.rw",
-                        "departmentCode": "CS",
-                        "program": "Computer Science"
-                      },
-                      "feeStructure": {
-                        "creditPrice": 500000,
-                        "registrationFee": 50000,
-                        "graduationFee": 100000
-                      },
-                      "balance": {
-                        "balance": 250000
-                      }
-                    }
-                    """)
+            @Operation(
+                summary = "Retrieve Student Data from AUCA System",
+                description = "Fetches comprehensive student information from the AUCA Finance system including department details, program information, fee structure, and current outstanding balance. This endpoint integrates with the external AUCA IMS API to retrieve real-time student data."
             )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid request - student ID format is incorrect",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": false,
-                      "error": "Invalid student ID format"
-                    }
-                    """)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Student not found in AUCA system",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": false,
-                      "error": "Student not found in AUCA"
-                    }
-                    """)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "500",
-            description = "Internal server error or AUCA service unavailable",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": false,
-                      "error": "Failed to connect to AUCA Finance service"
-                    }
-                    """)
-            )
-        )
-    })
+            @ApiResponses(value = {
+                @ApiResponse(
+                    responseCode = "200",
+                    description = "Student data successfully retrieved from AUCA system",
+                    content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(example = "{\n  \"success\": true,\n  \"student\": {\n    \"studentId\": \"STU001\",\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@auca.ac.rw\",\n    \"departmentCode\": \"CS\",\n    \"program\": \"Computer Science\"\n  },\n  \"feeStructure\": {\n    \"creditPrice\": 500000,\n    \"registrationFee\": 50000,\n    \"graduationFee\": 100000\n  },\n  \"balance\": {\n    \"balance\": 250000\n  }\n}")
+                    )
+                ),
+                @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request - student ID format is incorrect",
+                    content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Invalid student ID format\"\n}")
+                    )
+                ),
+                @ApiResponse(
+                    responseCode = "404",
+                    description = "Student not found in AUCA system",
+                    content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Student not found in AUCA\"\n}")
+                    )
+                ),
+                @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error or AUCA service unavailable",
+                    content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Failed to connect to AUCA Finance service\"\n}")
+                    )
+                )
+            })
     @GetMapping("/student/{studentId}")
     public ResponseEntity<?> getStudentFromAuca(
             @Parameter(
@@ -162,16 +115,7 @@ public class ContractController {
             description = "Balance successfully retrieved",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": true,
-                      "balance": {
-                        "balance": 250000,
-                        "studentId": "STU001",
-                        "currency": "RWF"
-                      }
-                    }
-                    """)
+                schema = @Schema(example = "{\n  \"success\": true,\n  \"balance\": {\n    \"balance\": 250000,\n    \"studentId\": \"STU001\",\n    \"currency\": \"RWF\"\n  }\n}")
             )
         ),
         @ApiResponse(
@@ -179,12 +123,7 @@ public class ContractController {
             description = "Invalid request - student ID format is incorrect",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": false,
-                      "error": "Invalid student ID format"
-                    }
-                    """)
+                schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Invalid student ID format\"\n}")
             )
         ),
         @ApiResponse(
@@ -192,13 +131,7 @@ public class ContractController {
             description = "Balance not found for the specified student",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": false,
-                      "error": "Balance not found for student",
-                      "studentId": "STU001"
-                    }
-                    """)
+                schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Balance not found for student\",\n  \"studentId\": \"STU001\"\n}")
             )
         ),
         @ApiResponse(
@@ -206,12 +139,7 @@ public class ContractController {
             description = "Internal server error or AUCA service unavailable",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": false,
-                      "error": "Failed to retrieve balance from AUCA Finance service"
-                    }
-                    """)
+                schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Failed to retrieve balance from AUCA Finance service\"\n}")
             )
         )
     })
@@ -243,21 +171,7 @@ public class ContractController {
 
     @Operation(
         summary = "Create Student Contract",
-        description = """
-            Creates a new contract for a student after validating payment eligibility.
-            The system verifies that the student has paid at least 50% of the total fees
-            before contract creation. Contract information is stored in the local database
-            and synchronized with AUCA Finance data.
-            \n\n
-            **Eligibility Criteria:**\n
-            - Student must exist in AUCA Finance system\n
-            - Student must have paid at least 50% of total fees\n
-            - Student must have valid department code\n
-            \n\n
-            **Contract Status Rules:**\n
-            - If outstanding balance is 0, status = \"COMPLETED\"\n
-            - If outstanding balance > 0 and payment >= 50%, status = \"ELIGIBLE_FOR_CONTRACT\"
-            """
+        description = "Creates a new contract for a student after validating payment eligibility. The system verifies that the student has paid at least 50% of the total fees before contract creation. Contract information is stored in the local database and synchronized with AUCA Finance data."
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -265,37 +179,7 @@ public class ContractController {
             description = "Contract successfully created",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": true,
-                      "contract": {
-                        "contractId": 1,
-                        "studentId": "STU001",
-                        "studentName": "John Doe",
-                        "totalAmount": 750000,
-                        "paidAmount": 400000,
-                        "remainingAmount": 350000,
-                        "status": "ELIGIBLE_FOR_CONTRACT",
-                        "paymentProgress": 53.33,
-                        "startDate": "2026-04-26",
-                        "endDate": "2027-06-30"
-                      },
-                      "student": {
-                        "studentId": "STU001",
-                        "name": "John Doe",
-                        "email": "john.doe@auca.ac.rw",
-                        "departmentCode": "CS"
-                      },
-                      "feeStructure": {
-                        "creditPrice": 500000,
-                        "registrationFee": 50000,
-                        "graduationFee": 100000,
-                        "totalFees": 750000
-                      },
-                      "balanceFromAuca": 350000,
-                      "paidFromAuca": 400000
-                    }
-                    """)
+                schema = @Schema(example = "{\n  \"success\": true,\n  \"contract\": {\n    \"contractId\": 1,\n    \"studentId\": \"STU001\",\n    \"studentName\": \"John Doe\",\n    \"totalAmount\": 750000,\n    \"paidAmount\": 400000,\n    \"remainingAmount\": 350000,\n    \"status\": \"ELIGIBLE_FOR_CONTRACT\",\n    \"paymentProgress\": 53.33,\n    \"startDate\": \"2026-04-26\",\n    \"endDate\": \"2027-06-30\"\n  },\n  \"student\": {\n    \"studentId\": \"STU001\",\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@auca.ac.rw\",\n    \"departmentCode\": \"CS\"\n  },\n  \"feeStructure\": {\n    \"creditPrice\": 500000,\n    \"registrationFee\": 50000,\n    \"graduationFee\": 100000,\n    \"totalFees\": 750000\n  },\n  \"balanceFromAuca\": 350000,\n  \"paidFromAuca\": 400000\n}")
             )
         ),
         @ApiResponse(
@@ -303,16 +187,7 @@ public class ContractController {
             description = "Contract creation failed - payment too low or invalid data",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": false,
-                      "error": "Payment too low. Student must pay at least 50%.",
-                      "paidAmount": 300000,
-                      "totalAmount": 750000,
-                      "remainingBalance": 450000,
-                      "requiredAmount": 375000
-                    }
-                    """)
+                schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Payment too low. Student must pay at least 50%.\",\n  \"paidAmount\": 300000,\n  \"totalAmount\": 750000,\n  \"remainingBalance\": 450000,\n  \"requiredAmount\": 375000\n}")
             )
         ),
         @ApiResponse(
@@ -320,12 +195,7 @@ public class ContractController {
             description = "Student not found in AUCA database",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": false,
-                      "error": "Student not found in AUCA database"
-                    }
-                    """)
+                schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Student not found in AUCA database\"\n}")
             )
         ),
         @ApiResponse(
@@ -333,12 +203,7 @@ public class ContractController {
             description = "Invalid request payload - missing required fields",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": false,
-                      "error": "Required field 'studentId' is missing"
-                    }
-                    """)
+                schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Required field 'studentId' is missing\"\n}")
             )
         ),
         @ApiResponse(
@@ -346,12 +211,7 @@ public class ContractController {
             description = "Internal server error during contract creation",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": false,
-                      "error": "Database connection error or unexpected system failure"
-                    }
-                    """)
+                schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Database connection error or unexpected system failure\"\n}")
             )
         )
     })
@@ -362,13 +222,7 @@ public class ContractController {
                 required = true,
                 content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(example = """
-                        {
-                          "studentId": "STU001",
-                          "notificationEmail": "student@email.com",
-                          "startDate": "2026-04-26"
-                        }
-                        """)
+                    schema = @Schema(example = "{\n  \"studentId\": \"STU001\",\n  \"notificationEmail\": \"student@email.com\",\n  \"startDate\": \"2026-04-26\"\n}")
                 )
             )
             @RequestBody Map<String, Object> request) {
@@ -484,22 +338,7 @@ public class ContractController {
 
     @Operation(
         summary = "Retrieve Contract by Student ID",
-        description = """
-            Retrieves a student's contract details including payment progress, status, and related information.
-            This endpoint returns comprehensive contract data along with the latest student information
-            from AUCA Finance system, current balance, and payment history.
-            \n\n
-            **Response includes:**\n
-            - Contract details (amounts, status, dates)\n
-            - Student information from AUCA\n
-            - Current balance from AUCA\n
-            - Payment history from AUCA\n
-            \n\n
-            **Contract Status Values:**\n
-            - `ELIGIBLE_FOR_CONTRACT`: Student has paid >= 50% but has remaining balance\n
-            - `COMPLETED`: Student has fully paid all fees\n
-            - `PENDING`: Contract not yet created (not in use)
-            """
+        description = "Retrieves a student's contract details including payment progress, status, and related information. This endpoint returns comprehensive contract data along with the latest student information from AUCA Finance system, current balance, and payment history."
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -507,48 +346,7 @@ public class ContractController {
             description = "Contract successfully retrieved",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": true,
-                      "contract": {
-                        "contractId": 1,
-                        "studentId": "STU001",
-                        "studentName": "John Doe",
-                        "totalAmount": 750000,
-                        "paidAmount": 400000,
-                        "remainingAmount": 350000,
-                        "status": "ELIGIBLE_FOR_CONTRACT",
-                        "paymentProgress": 53.33,
-                        "startDate": "2026-04-26",
-                        "endDate": "2027-06-30"
-                      },
-                      "studentFromAuca": {
-                        "studentId": "STU001",
-                        "name": "John Doe",
-                        "email": "john.doe@auca.ac.rw",
-                        "departmentCode": "CS",
-                        "program": "Computer Science"
-                      },
-                      "balanceFromAuca": {
-                        "balance": 350000,
-                        "studentId": "STU001"
-                      },
-                      "paymentsFromAuca": [
-                        {
-                          "paymentId": "PAY001",
-                          "amount": 200000,
-                          "date": "2026-01-15",
-                          "type": "TUITION"
-                        },
-                        {
-                          "paymentId": "PAY002",
-                          "amount": 200000,
-                          "date": "2026-02-20",
-                          "type": "TUITION"
-                        }
-                      ]
-                    }
-                    """)
+                schema = @Schema(example = "{\n  \"success\": true,\n  \"contract\": {\n    \"contractId\": 1,\n    \"studentId\": \"STU001\",\n    \"studentName\": \"John Doe\",\n    \"totalAmount\": 750000,\n    \"paidAmount\": 400000,\n    \"remainingAmount\": 350000,\n    \"status\": \"ELIGIBLE_FOR_CONTRACT\",\n    \"paymentProgress\": 53.33,\n    \"startDate\": \"2026-04-26\",\n    \"endDate\": \"2027-06-30\"\n  },\n  \"studentFromAuca\": {\n    \"studentId\": \"STU001\",\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@auca.ac.rw\",\n    \"departmentCode\": \"CS\",\n    \"program\": \"Computer Science\"\n  },\n  \"balanceFromAuca\": {\n    \"balance\": 350000,\n    \"studentId\": \"STU001\"\n  },\n  \"paymentsFromAuca\": [\n    {\n      \"paymentId\": \"PAY001\",\n      \"amount\": 200000,\n      \"date\": \"2026-01-15\",\n      \"type\": \"TUITION\"\n    },\n    {\n      \"paymentId\": \"PAY002\",\n      \"amount\": 200000,\n      \"date\": \"2026-02-20\",\n      \"type\": \"TUITION\"\n    }\n  ]\n}")
             )
         ),
         @ApiResponse(
@@ -556,12 +354,7 @@ public class ContractController {
             description = "No contract found for the specified student ID",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": false,
-                      "error": "Contract not found"
-                    }
-                    """)
+                schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Contract not found\"\n}")
             )
         ),
         @ApiResponse(
@@ -569,12 +362,7 @@ public class ContractController {
             description = "Invalid student ID format",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": false,
-                      "error": "Invalid student ID format"
-                    }
-                    """)
+                schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Invalid student ID format\"\n}")
             )
         ),
         @ApiResponse(
@@ -582,12 +370,7 @@ public class ContractController {
             description = "Internal server error or AUCA service unavailable",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                      "success": false,
-                      "error": "Failed to retrieve contract data"
-                    }
-                    """)
+                schema = @Schema(example = "{\n  \"success\": false,\n  \"error\": \"Failed to retrieve contract data\"\n}")
             )
         )
     })
